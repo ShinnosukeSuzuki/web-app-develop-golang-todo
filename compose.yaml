@@ -1,11 +1,13 @@
-version: "3.9"
 services:
   app:
     image: web-app-develop-golang-todo
     build:
       args:
-        - target=dev
+        - target=local
+    environment:
+      TODO_ENV: local
+      PORT: 8080
     volumes:
       - .:/app
     ports:
-      - "18000:80"
+      - "18000:8080"
