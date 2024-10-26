@@ -1,8 +1,5 @@
 linters-settings:
   govet:
-    settings:
-      shadow:
-        strict: false
   gocyclo:
     min-complexity: 30
   misspell:
@@ -12,7 +9,7 @@ linters:
   disable-all: true
   enable:
     - goimports
-    - deadcode
+    - unused
     - errcheck
     - gocognit
     - gocyclo
