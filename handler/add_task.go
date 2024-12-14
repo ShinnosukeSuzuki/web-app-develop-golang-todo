@@ -8,10 +8,12 @@ import (
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/entity"
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/store"
 	"github.com/go-playground/validator/v10"
+	"github.com/jmoiron/sqlx"
 )
 
 type AddTask struct {
-	Store     *store.TaskStore
+	DB        *sqlx.DB
+	Repo      *store.Repository
 	Validator *validator.Validate
 }
 
@@ -39,7 +41,7 @@ func (at *AddTask) ServeHttp(w http.ResponseWriter, r *http.Request) {
 		Status:  entity.TaskStatusToDo,
 		Created: time.Now(),
 	}
-	id, err := at.Store.Add(t)
+	err = at.Repo.AddTask(ctx, at.DB, t)
 	if err != nil {
 		RespondJSON(ctx, w, &ErrResponse{
 			Message: err.Error(),
@@ -48,6 +50,6 @@ func (at *AddTask) ServeHttp(w http.ResponseWriter, r *http.Request) {
 	}
 	rsp := struct {
 		ID entity.TaskID `json:"id"`
-	}{ID: id}
+	}{ID: t.ID}
 	RespondJSON(ctx, w, rsp, http.StatusOK)
 }
