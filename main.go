@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/config"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -29,7 +30,11 @@ func run(ctx context.Context) error {
 	url := fmt.Sprintf("http://%s", l.Addr().String())
 	log.Printf("start with: %v", url)
 
-	mux := NewMux()
+	mux, cleanup, err := NewMux(ctx, cfg)
+	if err != nil {
+		return err
+	}
+	defer cleanup()
 	s := NewServer(l, mux)
 	return s.Run(ctx)
 }
