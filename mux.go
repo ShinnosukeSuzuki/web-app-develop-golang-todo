@@ -7,6 +7,7 @@ import (
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/clock"
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/config"
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/handler"
+	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/service"
 	"github.com/ShinnosukeSuzuki/web-app-develop-golang-todo/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
@@ -24,9 +25,14 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		return nil, cleanup, err
 	}
 	r := store.Repository{Clocker: clock.RealClocker{}}
-	at := &handler.AddTask{DB: db, Repo: &r, Validator: v}
+	at := &handler.AddTask{
+		Service:   &service.AddTask{DB: db, Repo: &r},
+		Validator: v,
+	}
 	mux.Post("/tasks", at.ServeHttp)
-	lt := &handler.ListTask{DB: db, Repo: &r}
+	lt := &handler.ListTask{
+		Service: &service.ListTask{DB: db, Repo: &r},
+	}
 	mux.Get("/tasks", lt.ServeHttp)
 	return mux, cleanup, nil
 }
